@@ -1,0 +1,14 @@
+# Сборка
+build/
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+
+# Бинарники
+pls
+
+# IDE и ОС
+.vscode/
+.idea/
+.DS_Store

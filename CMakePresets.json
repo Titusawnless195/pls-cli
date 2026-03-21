@@ -1,0 +1,19 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "clang-lld",
+      "displayName": "Clang with LLD",
+      "description": "Использование Clang и линкера LLD для разработки",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "vendor": {
+        "comment": "Флаг для использования lld передается через опции таргета в CMakeLists.txt"
+      }
+    }
+  ]
+}
