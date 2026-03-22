@@ -7,6 +7,8 @@
 #include <vector>
 #include <algorithm>
 #include <unistd.h>
+#include <cstdlib>
+
 
 // Callback: вызывается cURL-ом, когда приходит порция данных от сервера
 size_t write_callback(void* contents, std::size_t size, std::size_t nmemb, std::string* userp)
@@ -16,16 +18,27 @@ size_t write_callback(void* contents, std::size_t size, std::size_t nmemb, std::
     return size * nmemb;
 }
 
-// Функция отправляет текст в буфер обмена системы Wayland
+// Функция отправляет текст в буфер обмена системы
 void copy_to_clipboard(const std::string& text)
 {
-    // Открываем программу wl-copy через "трубу" (pipe) в режиме записи
-    FILE* pipe = popen("wl-copy", "w");
+#ifdef __APPLE__ 
+    FILE* pipe = popen("pbcopy", "w"); 
     if (pipe) {
-        // Записываем текст команды в стандартный ввод wl-copy
         fwrite(text.c_str(), 1, text.length(), pipe);
-        pclose(pipe); // Закрываем поток, после чего данные попадают в буфер
+        pclose(pipe);
     }
+#else
+    // Попробуем wl-copy (Wayland)
+    if (FILE* pipe = popen("wl-copy", "w")) {
+        fwrite(text.c_str(), 1, text.length(), pipe);
+        if (pclose(pipe) == 0) return; // Успех
+    }
+    // Если не вышло, пробуем xclip (X11)
+    if (FILE* pipe = popen("xclip -selection clipboard", "w")) {
+        fwrite(text.c_str(), 1, text.length(), pipe);
+        pclose(pipe);
+    }
+#endif
 }
 
 std::vector<std::string> get_models() {
@@ -183,7 +196,6 @@ int main(int argc, char* argv[])
             }
             return 0;
         }
-
         if (flag == "--now" || flag == "-n") {
             std::string current = get_saved_model();
             if (current.empty()) {
