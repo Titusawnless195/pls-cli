@@ -264,7 +264,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    std::string model = getSavedModel();
+    std::string model = get_saved_model();
     if (model.empty()) {
         std::cerr << "The current model is not set. Run: pls --set <name>\n";
         return 1; // Обязательно выходим, иначе дальше будет ошибка
