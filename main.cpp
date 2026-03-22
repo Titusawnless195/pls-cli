@@ -6,10 +6,10 @@
 #include <filesystem>
 #include <vector>
 #include <algorithm>
-#include <unistd.h>  // Для isatty() и STDIN_FILENO
+#include <unistd.h>
 
 // Callback: вызывается cURL-ом, когда приходит порция данных от сервера
-size_t WriteCallback(void* contents, std::size_t size, std::size_t nmemb, std::string* userp)
+size_t write_callback(void* contents, std::size_t size, std::size_t nmemb, std::string* userp)
 {
     // Дописываем полученные байты в нашу строку-буфер
     userp->append((char*)contents, size * nmemb);
@@ -17,7 +17,7 @@ size_t WriteCallback(void* contents, std::size_t size, std::size_t nmemb, std::s
 }
 
 // Функция отправляет текст в буфер обмена системы Wayland
-void copyToClipboard(const std::string& text)
+void copy_to_clipboard(const std::string& text)
 {
     // Открываем программу wl-copy через "трубу" (pipe) в режиме записи
     FILE* pipe = popen("wl-copy", "w");
@@ -28,15 +28,14 @@ void copyToClipboard(const std::string& text)
     }
 }
 
-// список моделей
-std::vector<std::string> getModels() {
+std::vector<std::string> get_models() {
     std::vector<std::string> models;
     CURL* curl = curl_easy_init();
     std::string response;
 
     if (curl) {
         curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:11434/api/tags");
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 
         if (curl_easy_perform(curl) == CURLE_OK) {
@@ -55,8 +54,7 @@ std::vector<std::string> getModels() {
     return models;
 }
 
-// получаем модель
-std::string getSavedModel()
+std::string get_saved_model()
 {
     const char* home = getenv("HOME");
     if (!home) return ""; // Или путь по умолчанию
@@ -69,8 +67,7 @@ std::string getSavedModel()
     return "";
 }
 
-// получаем дистро
-void saveModelPreference(const std::string& modelName) {
+void save_model_preference(const std::string& model_name) {
     // Получаем путь к домашней директории пользователя
     const char* home = getenv("HOME");
     if (!home) return; // Или путь по умолчанию
@@ -79,7 +76,7 @@ void saveModelPreference(const std::string& modelName) {
 
     std::ofstream configFile(path);
     if (configFile.is_open()) {
-        configFile << modelName;
+        configFile << model_name;
         configFile.close();
     } else {
         std::cerr << "Failed to save settings.\n";
@@ -136,7 +133,7 @@ std::string scan_dir() {
     }
 }
 
-// Читаем данные из конвейера (pipe), если они есть
+// Читаем данные из конейера (pipe), если они есть
 std::string get_piped_input() {
     // Если ввод идет с терминала (человек), а не из пайпа — выходим
     if (isatty(STDIN_FILENO)) {
@@ -164,7 +161,7 @@ int main(int argc, char* argv[])
         std::string flag = argv[1];
 
         if (flag == "--list" || flag == "-l") {
-            std::vector<std::string> models = getModels();
+            std::vector<std::string> models = get_models();
             for (const auto& m : models) std::cout << m << std::endl;
             return 0;
         }
@@ -178,9 +175,9 @@ int main(int argc, char* argv[])
             // Чистим пробелы
             model_pick.erase(std::remove(model_pick.begin(), model_pick.end(), ' '), model_pick.end());
 
-            std::vector<std::string> models = getModels();
+            std::vector<std::string> models = get_models();
             if (std::ranges::contains(models, model_pick)) {
-                saveModelPreference(model_pick);
+                save_model_preference(model_pick);
             } else {
                 std::cerr << "Model '" << model_pick << "' is not found in Ollama.\n";
             }
@@ -188,7 +185,7 @@ int main(int argc, char* argv[])
         }
 
         if (flag == "--now" || flag == "-n") {
-            std::string current = getSavedModel();
+            std::string current = get_saved_model();
             if (current.empty()) {
                 std::cout << "The current model is not set. Run: pls --set <name>\n";
             } else {
@@ -198,7 +195,7 @@ int main(int argc, char* argv[])
         }
 
         if (flag == "--help" || flag == "-h") {
-            std::cout << R"(🍺 pls - AI Command Line Assistant (Powered by Ollama)
+            std::cout << R"(pls - AI Command Line Assistant (Powered by Ollama)
                 DESCRIPTION:
                 Translates natural language requests into executable bash/zsh commands.
                 Fully context-aware (OS, Package Manager, Current Directory, Pipes).
@@ -227,7 +224,7 @@ int main(int argc, char* argv[])
 
     // основной режим
     if (argc < 2) {
-        std::cerr << "🍺 Usage: pls <request> | pls --set <model> | pls --list\n";
+        std::cerr << "Usage: pls <request> | pls --set <model> | pls --list\n";
         return 1;
     }
 
@@ -251,11 +248,10 @@ int main(int argc, char* argv[])
 
     // Проверка: если запрос пустой (например, ввели только флаги)
     if (user_request.empty() || user_request.find_first_not_of(' ') == std::string::npos) {
-        std::cerr << "🍺 Usage: pls [-c] [-e] <request>\n";
+        std::cerr << "Usage: pls [-c] [-e] <request>\n";
         return 1;
     }
 
-    // получаем назание модели
     std::string model = getSavedModel();
     if (model.empty()) {
         std::cerr << "The current model is not set. Run: pls --set <name>\n";
@@ -325,7 +321,7 @@ int main(int argc, char* argv[])
         curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:11434/api/generate");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_data.c_str());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_string);
 
         // Скрываем индикатор прогресса загрузки
@@ -367,7 +363,7 @@ int main(int argc, char* argv[])
             // Вырезаем содержимое
             std::string raw_content = std::string(resp_view.substr(val_start, val_end - val_start));
 
-            // 3. Декодируем базовые JSON-сущности (экранированные кавычки и переносы)
+            // 3. Декодируем базовые JSON-сущности экранированные кавычки и переносы
             size_t p = 0;
             while ((p = raw_content.find("\\\"", p)) != std::string::npos) raw_content.replace(p, 2, "\"");
             p = 0;
@@ -395,7 +391,7 @@ int main(int argc, char* argv[])
     while (!cmd.empty() && (cmd.front() == ' ' || cmd.front() == '\n' || cmd.front() == '\r')) cmd.erase(0, 1);
     while (!cmd.empty() && (cmd.back() == ' ' || cmd.back() == '\n' || cmd.back() == '\r')) cmd.pop_back();
 
-    // НОВОЕ: Убиваем двойные или одинарные кавычки, если ИИ обернул в них команду
+    // Убиваем двойные или одинарные кавычки, если ИИ обернул в них команду
     if (!cmd.empty() && ((cmd.front() == '"' && cmd.back() == '"') || (cmd.front() == '\'' && cmd.back() == '\''))) {
         cmd = cmd.substr(1, cmd.length() - 2);
     }
@@ -409,16 +405,15 @@ int main(int argc, char* argv[])
     // Если ИИ добавил "bash " в начало строки вне блока кода
     if (cmd.starts_with("bash ")) cmd.erase(0, 5);
 
-    // Печать результата
     std::cout << "\r\033[1;32m" << cmd << "\033[0m\n";
 
     if (copy_flag) {
         // Копируем результат в буфер Wayland
-        copyToClipboard(cmd);
+        copy_to_clipboard(cmd);
     }
 
     if (execute_flag && !cmd.empty()) {
-        std::cout << "\n🚀 execute? [y/N]: " << std::flush;
+        std::cout << "\nexecute? [y/N]: " << std::flush;
         char confirm = 'N';
 
         if (!isatty(STDIN_FILENO)) {
